@@ -1,6 +1,6 @@
 # Daily AI News Agent
 
-This Python agent collects AI news from a small allowlist of primary sources, selects items published on the previous calendar day, asks OpenAI to create a concise, source-linked digest, and saves it as Markdown in `Dailynew/`.
+This Python agent collects AI news from a small allowlist of primary sources, selects items published on the previous calendar day, asks Gemini to create a concise, source-linked digest, and saves it as Markdown in `Dailynew/`.
 
 It is designed to run at 8:00 AM India Standard Time (IST) using GitHub Actions. The workflow commits the generated report back to the repository. Email delivery is optional and uses SMTP when the required secrets are present.
 
@@ -8,7 +8,7 @@ It is designed to run at 8:00 AM India Standard Time (IST) using GitHub Actions.
 
 - Model launches and updates
 - Research, product, API, and architecture announcements
-- Major AI announcements from OpenAI, Anthropic, Google DeepMind, Meta AI, Hugging Face, and Microsoft Research
+- Major AI announcements from OpenAI, Google DeepMind, Meta AI, Hugging Face, Microsoft Research, and reputable AI-focused reporting outlets
 
 Only items from the configured sources are used. The model is instructed to retain source links, distinguish announcements from speculation, and say when there were no qualifying stories.
 
@@ -21,7 +21,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-# add OPENAI_API_KEY to .env
+# add GEMINI_API_KEY to .env
 python -m app.daily_news
 ```
 
@@ -37,13 +37,15 @@ Reports are written to `Dailynew/YYYY-MM-DD.md`. `Dailynew/` is intentionally co
 
 Required:
 
-- `OPENAI_API_KEY` — API key for the summarisation step.
+- `GEMINI_API_KEY` — API key for the Gemini summarisation step.
 
 Optional:
 
-- `OPENAI_MODEL` — defaults to `gpt-5`.
+- `GEMINI_MODEL` — defaults to `gemini-3.6-flash`.
+- `GEMINI_MAX_ATTEMPTS` — retries temporary Gemini network/server errors; defaults to `3` total attempts.
 - `NEWS_TIMEZONE` — IANA timezone used to decide what “previous day” means; defaults to `Asia/Kolkata`.
 - `MAX_ARTICLES` — maximum source articles given to the summariser; defaults to `20`.
+- `MAX_ARTICLES_PER_SOURCE` — limits a busy publisher to four articles so one company or outlet cannot dominate the digest.
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `EMAIL_FROM`, `EMAIL_TO` — enable email delivery. `SMTP_USE_TLS` defaults to `true`.
 
 Source feeds live in `config/sources.json`. Prefer first-party newsrooms and RSS/Atom feeds; add a source only after checking that it has a stable feed and an identifiable publisher.
@@ -51,8 +53,8 @@ Source feeds live in `config/sources.json`. Prefer first-party newsrooms and RSS
 ## GitHub Actions setup
 
 1. Push this directory to a GitHub repository.
-2. In **Settings → Secrets and variables → Actions**, add `OPENAI_API_KEY` as a repository secret. Your local `.env` file is not uploaded to GitHub.
-3. For email, also add the SMTP/`EMAIL_*` variables above as repository secrets.
+2. In **Settings → Secrets and variables → Actions**, add `GEMINI_API_KEY` as a repository secret. Your local `.env` file is not uploaded to GitHub.
+3. For email, also add the SMTP/`EMAIL_*` variables above as repository secrets. `EMAIL_TO` accepts one or more comma-separated addresses, for example `person1@example.com, person2@example.com`.
 4. The included workflow runs at `08:00 IST` (02:30 UTC) every day and can be run manually from the Actions tab.
 
 GitHub Actions cron uses UTC. IST is UTC+05:30 and does not observe daylight saving time, so `30 2 * * *` always means 8:00 AM IST. If you later choose another timezone, update `.github/workflows/daily-news.yml` for its UTC time.
@@ -65,7 +67,7 @@ The workflow has `contents: write` permission and commits only files under `Dail
 python -m unittest discover -s tests -v
 ```
 
-The collector uses the Python standard library for HTTP and RSS/Atom parsing. The only package dependency is the official OpenAI Python SDK.
+The collector uses the Python standard library for HTTP and RSS/Atom parsing. The only package dependencies are the official Google Gen AI Python SDK and `python-dotenv`. Email messages are sent as clean HTML with a plain-text fallback.
 
 ## Safety and quality notes
 

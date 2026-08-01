@@ -28,8 +28,9 @@ jobs:
 
       - name: Generate digest
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.6-flash' }}
+          GEMINI_MAX_ATTEMPTS: ${{ vars.GEMINI_MAX_ATTEMPTS || '3' }}
           NEWS_TIMEZONE: ${{ vars.NEWS_TIMEZONE || 'Asia/Kolkata' }}
           MAX_ARTICLES: ${{ vars.MAX_ARTICLES || '20' }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}

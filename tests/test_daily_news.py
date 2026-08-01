@@ -2,7 +2,7 @@ from datetime import date
 from zoneinfo import ZoneInfo
 import unittest
 
-from app.daily_news import Article, parse_feed, select_for_day, strip_html
+from app.daily_news import Article, is_retryable_gemini_error, limit_per_source, markdown_to_email_html, parse_feed, parse_recipients, select_for_day, strip_html
 
 
 RSS = b'''<?xml version="1.0"?><rss><channel><item><title>Model release</title><link>https://example.com/model</link><pubDate>Thu, 31 Jul 2026 23:30:00 +0000</pubDate><description>&lt;p&gt;A &lt;b&gt;new&lt;/b&gt; model&lt;/p&gt;</description></item></channel></rss>'''
@@ -28,6 +28,23 @@ class DailyNewsTests(unittest.TestCase):
 
     def test_strip_html(self):
         self.assertEqual(strip_html("<p>Hello&nbsp;<em>world</em></p>"), "Hello world")
+
+    def test_limits_articles_per_source(self):
+        articles = parse_feed(RSS, "Example") * 3
+        self.assertEqual(len(limit_per_source(articles, 2)), 2)
+
+    def test_parses_multiple_recipients_and_renders_html(self):
+        self.assertEqual(parse_recipients("one@example.com, two@example.com"), ["one@example.com", "two@example.com"])
+        email_html = markdown_to_email_html("# Daily AI News\n\n## Highlights\n\n### Launch\nSource: [Example](https://example.com)")
+        self.assertIn("Daily AI Briefing", email_html)
+        self.assertIn('href="https://example.com"', email_html)
+
+    def test_only_retries_transient_gemini_errors(self):
+        transient = RuntimeError("incomplete chunked read")
+        quota = RuntimeError("quota")
+        quota.status_code = 429
+        self.assertTrue(is_retryable_gemini_error(transient))
+        self.assertFalse(is_retryable_gemini_error(quota))
 
 
 if __name__ == "__main__":
