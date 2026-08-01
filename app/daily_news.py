@@ -259,7 +259,9 @@ def markdown_to_email_html(markdown_text: str) -> str:
             finish_list()
             blocks.append(f'<h3>{inline_markdown_to_html(line[4:])}</h3>')
         elif re.match(r"[-*]\s+", line):
-            list_items.append(f'<li>{inline_markdown_to_html(re.sub(r"^[-*]\\s+", "", line))}</li>')
+            # ✅ FIX: Separate the regex operation from the f-string
+            cleaned_line = re.sub(r"^[-*]\s+", "", line)
+            list_items.append(f'<li>{inline_markdown_to_html(cleaned_line)}</li>')  
         elif line.startswith("_") and line.endswith("_"):
             finish_list()
             blocks.append(f'<p class="coverage">{inline_markdown_to_html(line.strip("_"))}</p>')
