@@ -2,7 +2,7 @@ name: Daily AI news
 
 on:
   schedule:
-    # 08:00 India Standard Time (UTC+05:30)
+    # 08:00 India Standard Time (IST) = 02:30 UTC
     - cron: "30 2 * * *"
   workflow_dispatch:
 
@@ -24,12 +24,13 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       - name: Generate digest
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.6-flash' }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
           GEMINI_MAX_ATTEMPTS: ${{ vars.GEMINI_MAX_ATTEMPTS || '3' }}
           NEWS_TIMEZONE: ${{ vars.NEWS_TIMEZONE || 'Asia/Kolkata' }}
           MAX_ARTICLES: ${{ vars.MAX_ARTICLES || '20' }}
