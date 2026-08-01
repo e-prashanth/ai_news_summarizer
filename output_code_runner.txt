@@ -1,0 +1,34 @@
+WARNING: Could not collect Anthropic News: HTTP Error 404: Not Found
+INFO: HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 429 Too Many Requests"
+INFO: Retrying request to /responses in 0.459902 seconds
+INFO: HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 429 Too Many Requests"
+INFO: Retrying request to /responses in 0.770911 seconds
+INFO: HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 429 Too Many Requests"
+Traceback (most recent call last):
+  File "/home/e_prashanth/projects/ai-news-summarising-agent/app/daily_news.py", line 151, in summarise
+    response = OpenAI().responses.create(model=model, input=prompt)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/e_prashanth/projects/ai-news-summarising-agent/.venv/lib/python3.12/site-packages/openai/resources/responses/responses.py", line 1016, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/home/e_prashanth/projects/ai-news-summarising-agent/.venv/lib/python3.12/site-packages/openai/_base_client.py", line 1375, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/e_prashanth/projects/ai-news-summarising-agent/.venv/lib/python3.12/site-packages/openai/_base_client.py", line 1148, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/e_prashanth/projects/ai-news-summarising-agent/app/daily_news.py", line 233, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/e_prashanth/projects/ai-news-summarising-agent/app/daily_news.py", line 222, in main
+    body = summarise(selected, target_day, os.getenv("OPENAI_MODEL", "gpt-5"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/e_prashanth/projects/ai-news-summarising-agent/app/daily_news.py", line 154, in summarise
+    raise RuntimeError(
+RuntimeError: The OpenAI API key has no available quota. Add API billing or credits in the OpenAI Platform, then run the command again.

@@ -1,0 +1,9 @@
+[
+  {"name": "OpenAI News", "feed_url": "https://openai.com/news/rss.xml"},
+  {"name": "Anthropic News", "feed_url": "https://www.anthropic.com/news/rss.xml"},
+  {"name": "Google DeepMind Blog", "feed_url": "https://deepmind.google/blog/rss.xml"},
+  {"name": "Google AI Blog", "feed_url": "https://blog.google/technology/ai/rss/"},
+  {"name": "Meta Newsroom", "feed_url": "https://about.fb.com/news/feed/"},
+  {"name": "Hugging Face Blog", "feed_url": "https://huggingface.co/blog/feed.xml"},
+  {"name": "Microsoft Research Blog", "feed_url": "https://www.microsoft.com/en-us/research/feed/"}
+]
