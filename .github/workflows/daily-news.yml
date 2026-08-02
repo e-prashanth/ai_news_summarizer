@@ -4,7 +4,7 @@ on:
   schedule:
     # 08:00 India Standard Time (IST) = 02:30 UTC
     - cron: "40 4 * * *"
-  workflow_dispatch:
+  # workflow_dispatch:
 
 permissions:
   contents: write
