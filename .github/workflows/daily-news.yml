@@ -1,9 +1,6 @@
 name: Daily AI news
 
 on:
-  schedule:
-    # 08:00 India Standard Time (IST) = 02:30 UTC
-    - cron: 50 4 * * *
   workflow_dispatch:
 
 permissions:
