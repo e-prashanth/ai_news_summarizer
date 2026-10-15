@@ -144,6 +144,23 @@ def limit_per_source(articles: list[Article], maximum: int) -> list[Article]:
     return balanced
 
 
+def describe_gemini_error(error: Exception) -> str:
+    """Return everything Gemini told us about a failure, so CI logs show the real cause."""
+    parts = [f"type={type(error).__module__}.{type(error).__name__}"]
+    for name in ("code", "status_code", "status", "message", "details", "body"):
+        value = getattr(error, name, None)
+        if value:
+            parts.append(f"{name}={value}")
+    response = getattr(error, "response", None)
+    headers = getattr(response, "headers", None)
+    if headers:
+        for header in ("retry-after", "x-ratelimit-limit", "x-ratelimit-remaining"):
+            if header in headers:
+                parts.append(f"{header}={headers[header]}")
+    parts.append(f"error={error}")
+    return "\n  ".join(parts)
+
+
 def is_retryable_gemini_error(error: Exception) -> bool:
     """Retry connection and server failures, but not bad keys, prompts, or quota limits."""
     status_code = getattr(error, "code", None) or getattr(error, "status_code", None)
@@ -180,6 +197,13 @@ Source records:
             raise RuntimeError("Gemini returned no text for this digest.")
         except Exception as error:
             status_code = getattr(error, "code", None) or getattr(error, "status_code", None)
+            LOGGER.error(
+                "Gemini request failed (model=%s, attempt %d/%d):\n  %s",
+                model,
+                attempt,
+                max_attempts,
+                describe_gemini_error(error),
+            )
             if status_code == 429:
                 raise RuntimeError(
                     "Gemini API quota was reached. Check the free-tier limit in Google AI Studio and retry later."
